@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { useLogoUrl, useVideoUrl } from "@/hooks/use-assets"
+import { useLogoUrl } from "@/hooks/use-assets"
 
 import { useRouter } from "next/navigation"
 import { SlidingCardCarousel } from "@/components/sliding-card-carousel"
@@ -56,7 +56,6 @@ const ClientOnly = ({ children, fallback = null }: { children: React.ReactNode, 
 export default function DopeTechEcommerce() {
   const router = useRouter()
   const { logoUrl, loading: logoLoading } = useLogoUrl()
-  const { videoUrl, loading: videoLoading } = useVideoUrl()
   const [scrollY, setScrollY] = useState(0)
   const [products, setProducts] = useState<Product[]>([])
   const [dopePicks, setDopePicks] = useState<Product[]>([])
@@ -1273,26 +1272,74 @@ export default function DopeTechEcommerce() {
             </p>
           </div>
 
-          {/* Video Container */}
+          {/* Featured Product Image Container */}
           <div className="w-full mx-auto animate-fade-in-up borderless-glow cv-auto rounded-2xl overflow-hidden ring-1 ring-white/10">
-            <video
-              src={videoLoading ? "/video/footervid.mp4" : videoUrl}
-              className="w-full h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 2xl:h-80 shadow-xl object-cover object-center"
-              autoPlay
-              loop
-              muted
-              playsInline
-              key={animationKey}
-              onError={(e) => {
-                // Silently handle video errors to prevent console spam
-                const videoElement = e.target as HTMLVideoElement;
-                if (videoElement) {
-                  videoElement.style.display = 'none';
-                }
-              }}
-              onLoadStart={() => {}}
-              onCanPlay={() => {}}
-            />
+            <div className="w-full h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 2xl:h-80 shadow-xl relative overflow-hidden">
+              {dopePicks.length > 0 ? (
+                // Show featured product image
+                <div 
+                  className="relative w-full h-full group cursor-pointer"
+                  onClick={() => {
+                    if (dopePicks[0]) {
+                      router.push(`/product/${dopePicks[0].id}`)
+                    }
+                  }}
+                >
+                  <img
+                    src={getPrimaryImageUrl(dopePicks[0])}
+                    alt={dopePicks[0].name}
+                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-product.svg';
+                    }}
+                  />
+                  {/* Overlay with product info */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
+                    <div className="p-4 sm:p-6 w-full">
+                      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                        {dopePicks[0].name}
+                      </h3>
+                      <p className="text-sm sm:text-base md:text-lg text-[#F7DD0F] font-semibold drop-shadow-lg">
+                        Rs {dopePicks[0].price}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-300 mt-1 drop-shadow-lg">
+                        Featured Pick
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Hover effect overlay */}
+                  <div className="absolute inset-0 bg-[#F7DD0F]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="bg-black/80 backdrop-blur-sm rounded-xl px-4 py-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      <p className="text-white text-sm font-medium">View Product</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Fallback placeholder
+                <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center relative overflow-hidden">
+                  <div className="text-center p-6">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto mb-4 bg-gradient-to-br from-[#F7DD0F] to-[#F7DD0F]/80 rounded-full flex items-center justify-center">
+                      <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-black" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2">
+                      Dope Picks
+                    </h3>
+                    <p className="text-sm sm:text-base md:text-lg text-gray-300">
+                      Check out our latest recommendations
+                    </p>
+                  </div>
+                  
+                  {/* Optional: Add a subtle animated background */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#F7DD0F]/20 via-transparent to-[#F7DD0F]/20 animate-pulse"></div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

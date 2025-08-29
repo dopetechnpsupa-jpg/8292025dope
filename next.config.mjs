@@ -6,12 +6,9 @@ const __dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for Netlify deployment with static export
-  // output: 'export', // Commented out for development
-  // trailingSlash: true, // Commented out for development
-  // distDir: 'out', // Commented out for development
+  // Production optimizations
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: false, // Enable image optimization for production
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

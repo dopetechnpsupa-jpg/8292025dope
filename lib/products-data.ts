@@ -111,6 +111,10 @@ const fallbackProducts: Product[] = [
   }
 ];
 
+// Cache for product data to avoid repeated database calls
+const productCache = new Map<number, { product: Product; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 // Fetch products from Supabase with local fallback
 export async function getProducts(): Promise<Product[]> {
   try {
@@ -176,27 +180,73 @@ export async function getProductById(id: number): Promise<Product | null> {
   }
 }
 
-// Fetch a single product by ID with its images
-export async function getProductByIdWithImages(id: number): Promise<Product | null> {
+// Optimized function to fetch product with images in a single query
+export async function getProductByIdWithImagesOptimized(id: number): Promise<Product | null> {
   try {
-    // First get the product
-    const product = await getProductById(id);
-    if (!product) {
+    // Check cache first
+    const cached = productCache.get(id);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log('📦 Using cached product data for ID:', id);
+      return cached.product;
+    }
+
+    // Single optimized query to get product with images
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        product_images (
+          id,
+          product_id,
+          image_url,
+          file_name,
+          display_order,
+          is_primary,
+          created_at,
+          updated_at
+        )
+      `)
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching product with images:', error);
       return null;
     }
 
-    // Then get the product images
-    const images = await getProductImages(id);
-    
-    // Return product with images
-    return {
-      ...product,
-      images: images
+    if (!data) {
+      return null;
+    }
+
+    // Transform the data to match our Product interface
+    const product: Product = {
+      ...data,
+      images: data.product_images?.map((img: any) => ({
+        id: img.id,
+        product_id: img.product_id,
+        image_url: img.image_url,
+        file_name: img.file_name,
+        display_order: img.display_order || 0,
+        is_primary: img.is_primary,
+        created_at: img.created_at,
+        updated_at: img.updated_at
+      })) || []
     };
+
+    // Cache the result
+    productCache.set(id, { product, timestamp: Date.now() });
+    
+    return product;
   } catch (error) {
     console.error('Error fetching product with images:', error);
     return null;
   }
+}
+
+// Fetch a single product by ID with its images
+export async function getProductByIdWithImages(id: number): Promise<Product | null> {
+  // Use the optimized version
+  return getProductByIdWithImagesOptimized(id);
 }
 
 // Get products by category

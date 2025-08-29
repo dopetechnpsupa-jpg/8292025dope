@@ -1,4 +1,4 @@
-import { getProductByIdWithImages, getProducts, getPrimaryImageUrl } from "@/lib/products-data"
+import { getProductByIdWithImages, getProductsByCategory, getPrimaryImageUrl } from "@/lib/products-data"
 import ProductPageClient from "./product-page-client"
 import { Metadata } from "next"
 
@@ -146,13 +146,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
       )
     }
 
-    // Get related products from the same category
-    const allProducts = await getProducts()
-    const relatedProducts = allProducts
-      .filter(p => p.id !== productId && p.category === product.category)
+    // Optimized: Get related products from the same category only
+    const relatedProducts = await getProductsByCategory(product.category)
+    const filteredRelatedProducts = relatedProducts
+      .filter(p => p.id !== productId)
       .slice(0, 6)
 
-    return <ProductPageClient product={product} relatedProducts={relatedProducts} />
+    return <ProductPageClient product={product} relatedProducts={filteredRelatedProducts} />
   } catch (error) {
     console.error('Error fetching product:', error)
     return (

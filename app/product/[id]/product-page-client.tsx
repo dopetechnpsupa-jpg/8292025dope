@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Plus, Heart, Star, Truck, Shield, RotateCcw, ShoppingBag, X, Minus, Edit, Check, Zap, Award, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,8 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [editingCartItem, setEditingCartItem] = useState<number | null>(null)
+  const [imagesLoaded, setImagesLoaded] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const { 
     cart, 
     addToCart, 
@@ -56,6 +58,15 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
     setIsWishlisted(!isWishlisted)
   }
 
+  // Hide initial loading overlay after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000) // Show loading for 1 second
+
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div className="min-h-screen bg-black">
       {/* SEO Structured Data */}
@@ -71,6 +82,17 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
           { name: product.name, url: `/product/${product.id}` }
         ])} 
       />
+      
+      {/* Initial Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#F7DD0F] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="text-[#F7DD0F] font-bold text-xl mb-2">Loading Product...</p>
+            <p className="text-gray-400 text-base">Preparing your shopping experience</p>
+          </div>
+        </div>
+      )}
       {/* Enhanced Header */}
       <div className="bg-[#1a1a1a] backdrop-blur-xl border-b border-[#F7DD0F]/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
@@ -78,6 +100,8 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                          <Button
                variant="ghost"
                onClick={() => {
+                 // Set flag for back navigation
+                 sessionStorage.setItem('dopetech-returning', 'true')
                  // Navigate back to home page
                  router.push('/', { scroll: false })
                }}
@@ -118,11 +142,25 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
             <div className="relative group">
               <div className="aspect-square max-w-md mx-auto xl:max-w-lg bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl border border-[#F7DD0F]/20 hover:border-[#F7DD0F]/40 transition-all duration-500">
                 <div className="relative w-full h-full">
+                  {/* Loading Overlay - Only show if not navigating back */}
+                  {!imagesLoaded && !sessionStorage.getItem('dopetech-returning') && (
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-10">
+                      <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-[#F7DD0F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-[#F7DD0F] font-semibold text-lg">Loading...</p>
+                        <p className="text-gray-400 text-sm mt-2">Preparing your product view</p>
+                      </div>
+                    </div>
+                  )}
+                  
                   <img
                     src={getProductImageUrls(product)[selectedImage] || getPrimaryImageUrl(product)}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
-                    loading="lazy"
+                    className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:brightness-110 ${
+                      imagesLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading={selectedImage === 0 ? "eager" : "lazy"}
+                    onLoad={() => setImagesLoaded(true)}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/placeholder-product.svg';
@@ -144,7 +182,10 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                 {getProductImageUrls(product).map((image, index) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
+                    onClick={() => {
+                      setSelectedImage(index)
+                      setImagesLoaded(false) // Reset loading state when changing images
+                    }}
                     className={`aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 ${
                       selectedImage === index 
                         ? 'border-yellow-500 shadow-lg ring-2 ring-yellow-500/30 scale-105' 

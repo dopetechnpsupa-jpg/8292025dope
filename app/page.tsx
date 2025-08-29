@@ -283,9 +283,12 @@ export default function DopeTechEcommerce() {
   // Performance optimization hooks
   const { isLoading: isDataLoading, withLoading } = useLoadingState()
   
-  // Splash screen state
-  const [showSplash, setShowSplash] = useState(false) // Start as false
-  const [isAppReady, setIsAppReady] = useState(false)
+  // Splash screen state - check for back navigation immediately
+  const initialSplashState = typeof window !== 'undefined' ? !sessionStorage.getItem('dopetech-returning') : true
+  const initialAppReadyState = typeof window !== 'undefined' ? !!sessionStorage.getItem('dopetech-returning') : false
+  
+  const [showSplash, setShowSplash] = useState(initialSplashState)
+  const [isAppReady, setIsAppReady] = useState(initialAppReadyState)
 
   const [editingCartItem, setEditingCartItem] = useState<number | null>(null)
   const { 
@@ -337,6 +340,7 @@ export default function DopeTechEcommerce() {
   const [animationKey, setAnimationKey] = useState(0)
   const [isLoading, setIsLoading] = useState(false) // Start as false to prevent hydration mismatch
   const [isClientLoading, setIsClientLoading] = useState(false) // Client-only loading state
+  const [isPageLoading, setIsPageLoading] = useState(false) // Page navigation loading state
   const [posterIndex, setPosterIndex] = useState(0)
   const [lastFetchTime, setLastFetchTime] = useState(0) // Track last fetch time to prevent excessive requests
   const searchModalRef = useRef<HTMLDivElement>(null)
@@ -345,27 +349,61 @@ export default function DopeTechEcommerce() {
 
   // Handle splash screen completion
   const handleSplashComplete = useCallback(() => {
+    console.log('✅ Splash screen completed, showing main app')
     setShowSplash(false)
     setIsAppReady(true)
   }, [])
 
-  // Check if this is the first visit to show splash screen
+  // Show splash screen on every page load
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasVisitedBefore = localStorage.getItem('dopetech-has-visited')
+      // Check if this is a back navigation or fresh page load
+      const isBackNavigation = sessionStorage.getItem('dopetech-returning')
       
-      if (!hasVisitedBefore) {
-        // First time visitor - show splash screen
-        setShowSplash(true)
-        // Mark as visited
-        localStorage.setItem('dopetech-has-visited', 'true')
-      } else {
-        // Returning visitor - skip splash screen
+      console.log('🔍 Checking navigation type:', { isBackNavigation })
+      
+      if (isBackNavigation) {
+        // Back navigation - skip splash screen entirely
+        console.log('🔄 Back navigation detected - skipping splash screen')
         setShowSplash(false)
         setIsAppReady(true)
+        // Clean up sessionStorage after a short delay to ensure it's processed
+        setTimeout(() => {
+          sessionStorage.removeItem('dopetech-returning')
+        }, 100)
+        // No loading overlay - direct transition
+      } else {
+        // Fresh page load - show splash screen
+        setShowSplash(true)
+        console.log('🎬 Fresh page load - splash screen should be visible now')
+        
+        // Fallback: If splash screen doesn't complete within 10 seconds, show app anyway
+        const fallbackTimer = setTimeout(() => {
+          console.log('⏰ Fallback: Showing app after 10 seconds')
+          setShowSplash(false)
+          setIsAppReady(true)
+        }, 10000)
+        
+        return () => clearTimeout(fallbackTimer)
       }
     }
   }, [])
+
+  // Clear loading states when component mounts (e.g., when navigating back)
+  useEffect(() => {
+    if (isAppReady) {
+      setIsLoading(false)
+      setIsClientLoading(false)
+    }
+  }, [isAppReady])
+
+  // Prevent normal loading overlay during splash screen
+  useEffect(() => {
+    if (showSplash) {
+      setIsLoading(false)
+      setIsClientLoading(false)
+    }
+  }, [showSplash])
 
   // Optimized scroll handler with passive listener
   useEffect(() => {
@@ -885,6 +923,7 @@ export default function DopeTechEcommerce() {
   }, [posterIndex, products])
 
   const handleCategoryClick = (categoryId: string) => {
+    setIsLoading(true) // Show loading state
     setSelectedCategory(categoryId)
     // Clear search when switching categories
     setSearchQuery("")
@@ -905,6 +944,8 @@ export default function DopeTechEcommerce() {
           behavior: 'smooth'
         })
       }
+      // Hide loading after scroll completes
+      setTimeout(() => setIsLoading(false), 500)
     }, 100)
   }
 
@@ -944,6 +985,14 @@ export default function DopeTechEcommerce() {
   const handleCartReset = () => {
     clearCart()
     setCheckoutModalOpen(false)
+  }
+
+  const handleProductNavigation = (productId: string) => {
+    setIsLoading(true) // Show loading state
+    // Set flag to indicate we're navigating to a product page
+    sessionStorage.setItem('dopetech-returning', 'true')
+    router.push(`/product/${productId}`)
+    // Loading will be hidden when the new page loads
   }
 
   const filteredProducts = useMemo(() => {
@@ -1263,9 +1312,28 @@ export default function DopeTechEcommerce() {
       <StructuredData type="local-business" />
       
       {/* Splash Screen - Client Only */}
-      <ClientOnly fallback={null}>
+      <ClientOnly fallback={
+        <div className="w-full h-screen bg-[#F7DD0F] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-black font-bold text-xl">Loading DopeTech...</p>
+          </div>
+        </div>
+      }>
         <SplashScreen isVisible={showSplash} onComplete={handleSplashComplete} />
       </ClientOnly>
+
+      {/* Normal Loading Overlay - for navigation and other loading states */}
+      {/* Only show when splash screen is not visible and app is ready */}
+      {!showSplash && isAppReady && (isLoading || isClientLoading || isDataLoading || isNavigating) && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-40">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-[#F7DD0F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[#F7DD0F] font-semibold text-lg mb-2">Loading...</p>
+            <p className="text-gray-400 text-sm">Please wait</p>
+          </div>
+        </div>
+      )}
 
       {/* Main App Content - Only show when splash is complete */}
       {isAppReady && (
@@ -1593,7 +1661,7 @@ export default function DopeTechEcommerce() {
                <div key={product.id} data-product-id={product.id} className="group animate-fade-in-up hover-lift product-card-fluid scroll-animate h-full" style={{ animationDelay: `${index * 0.1}s` }}>
                  <div 
                    className="relative bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-yellow-500/20 hover:border-yellow-500/40 cursor-pointer h-full flex flex-col"
-                   onClick={() => router.push(generateProductUrl(product))}
+                   onClick={() => handleProductNavigation(product.id.toString())}
                  >
                    {/* Top Section - Image with White Background */}
                    <div className="relative aspect-[4/3] overflow-hidden bg-white flex-shrink-0">
@@ -1712,7 +1780,7 @@ export default function DopeTechEcommerce() {
                           <div
                             key={product.id}
                             className="group/item relative bg-gray-900 rounded-lg border border-[#F7DD0F]/20 overflow-hidden hover:shadow-md transition-all duration-300 hover:transform hover:scale-[1.02] hover:border-[#F7DD0F]/40 cursor-pointer"
-                            onClick={() => router.push(generateProductUrl(product))}
+                            onClick={() => handleProductNavigation(product.id.toString())}
                           >
                             {/* Product Image */}
                             <div className="aspect-square bg-gray-800 relative overflow-hidden">
@@ -1795,7 +1863,7 @@ export default function DopeTechEcommerce() {
                   <div className="group relative mb-3">
                     <div 
                       className="relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-                      onClick={() => router.push(generateProductUrl(product))}
+                      onClick={() => handleProductNavigation(product.id.toString())}
                     >
                       {/* Full Image Section */}
                       <div className="relative aspect-square overflow-hidden bg-white max-w-full">
@@ -1891,7 +1959,7 @@ export default function DopeTechEcommerce() {
                   className="relative w-full h-full group cursor-pointer"
                   onClick={() => {
                     if (dopePicks[0]) {
-                      router.push(`/product/${dopePicks[0].id}`)
+                      handleProductNavigation(dopePicks[0].id.toString())
                     }
                   }}
                 >

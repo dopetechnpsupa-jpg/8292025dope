@@ -143,7 +143,7 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
               <div className="aspect-square max-w-md mx-auto xl:max-w-lg bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl border border-[#F7DD0F]/20 hover:border-[#F7DD0F]/40 transition-all duration-500">
                 <div className="relative w-full h-full">
                   {/* Loading Overlay - Only show if not navigating back */}
-                  {!imagesLoaded && !sessionStorage.getItem('dopetech-returning') && (
+                  {!imagesLoaded && typeof window !== 'undefined' && !sessionStorage.getItem('dopetech-returning') && (
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-10">
                       <div className="text-center">
                         <div className="w-12 h-12 border-4 border-[#F7DD0F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>

@@ -1,4 +1,4 @@
-import { getProductByIdWithImages, getProductsByCategory, getPrimaryImageUrl } from "@/lib/products-data"
+import { getProductByIdWithImages, getProductsByCategory, getPrimaryImageUrl, getProducts } from "@/lib/products-data"
 import ProductPageClient from "./product-page-client"
 import { Metadata } from "next"
 

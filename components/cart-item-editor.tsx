@@ -68,38 +68,38 @@ export function CartItemEditor({
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-[#1a1a1a] rounded-lg shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-gray-900">
               Customize {product.name}
             </h3>
             <button
               onClick={onCancel}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <X className="w-5 h-5 text-gray-900 dark:text-white" />
+              <X className="w-5 h-5 text-gray-900" />
             </button>
           </div>
 
           {/* Product Info */}
-          <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 dark:bg-[#2a2a2a] rounded-lg">
+          <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
             <img
               src={product.image_url}
               alt={product.name}
               className="w-12 h-12 object-cover rounded-lg"
             />
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white text-sm">{product.name}</h4>
-                              <p className="text-[#F7DD0F] price-proxima-nova text-sm">Rs {product.price}</p>
+              <h4 className="font-medium text-gray-900 text-sm">{product.name}</h4>
+              <p className="text-[#feda00] price-proxima-nova text-sm">Rs {product.price}</p>
             </div>
           </div>
 
           {/* Color Selection */}
           {availableColors.length > 0 && (
             <div className="space-y-2 mb-4">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Color</label>
+              <label className="text-sm font-medium text-gray-700">Color</label>
               <div className="flex flex-wrap gap-2">
                 {availableColors.map((color) => (
                   <button
@@ -107,8 +107,8 @@ export function CartItemEditor({
                     onClick={() => handleColorSelect(color)}
                     className={`px-3 py-2 rounded-lg border transition-all duration-200 ${
                       selectedColor === color
-                        ? 'bg-[#F7DD0F] text-black border-[#F7DD0F] shadow-lg'
-                        : 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-[#3a3a3a]'
+                        ? 'bg-[#feda00] text-black border-[#feda00] shadow-lg'
+                        : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -124,7 +124,7 @@ export function CartItemEditor({
           {/* Features Selection */}
           {availableFeatures.length > 0 && (
             <div className="space-y-2 mb-6">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Features</label>
+              <label className="text-sm font-medium text-gray-700">Features</label>
               <div className="flex flex-wrap gap-2">
                 {availableFeatures.map((feature) => (
                   <button
@@ -132,8 +132,8 @@ export function CartItemEditor({
                     onClick={() => handleFeatureToggle(feature)}
                     className={`px-3 py-2 rounded-lg border transition-all duration-200 ${
                       selectedFeatures.includes(feature)
-                        ? 'bg-[#F7DD0F] text-black border-[#F7DD0F] shadow-lg'
-                        : 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-[#3a3a3a]'
+                        ? 'bg-[#feda00] text-black border-[#feda00] shadow-lg'
+                        : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -157,7 +157,7 @@ export function CartItemEditor({
             </Button>
             <Button
               onClick={handleSave}
-              className="flex-1 bg-[#F7DD0F] text-black hover:bg-[#F7DD0F]/90"
+              className="flex-1 bg-[#feda00] text-black hover:bg-[#feda00]/90"
             >
               Save Changes
             </Button>

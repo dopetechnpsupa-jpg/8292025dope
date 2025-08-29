@@ -123,7 +123,7 @@ export function DopeDailyShowcase({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
       transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-             className={`relative overflow-hidden rounded-3xl bg-black/10 backdrop-blur-xl shadow-2xl ${className}`}
+             className={`relative overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-200 ${className}`}
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
@@ -136,7 +136,7 @@ export function DopeDailyShowcase({
            initial={{ opacity: 0, y: -10 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.5, delay: 0.1 }}
-           className="inline-flex items-center gap-3 bg-black text-[#F7DD0F] px-6 py-3 rounded-full text-base sm:text-lg font-bold shadow-xl"
+           className="inline-flex items-center gap-3 bg-black text-[#feda00] px-6 py-3 rounded-full text-base sm:text-lg font-bold shadow-xl"
          >
            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
            ★ Dope Daily Picks
@@ -173,7 +173,7 @@ export function DopeDailyShowcase({
           repeat: Infinity, 
           ease: "easeInOut" 
         }}
-        className="absolute top-4 right-4 w-12 h-12 bg-black/10 rounded-full blur-xl"
+        className="absolute top-4 right-4 w-12 h-12 bg-gray-200 rounded-full blur-xl"
       />
       
       <motion.div
@@ -187,7 +187,7 @@ export function DopeDailyShowcase({
           ease: "easeInOut",
           delay: 1 
         }}
-        className="absolute bottom-8 left-8 w-8 h-8 bg-black/10 rounded-full blur-lg"
+        className="absolute bottom-8 left-8 w-8 h-8 bg-gray-200 rounded-full blur-lg"
       />
     </motion.div>
   )
@@ -207,7 +207,7 @@ function ProductCard({ product, index, onAddToCart, onViewProduct }: ProductCard
        initial={{ opacity: 0, scale: 0.95 }}
        animate={{ opacity: 1, scale: 1 }}
        transition={{ duration: 0.5, delay: index * 0.1 }}
-                               className="flex flex-row items-center gap-3 bg-black/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#feda00]/30 hover:bg-black/90 transition-all duration-300 shadow-lg"
+                               className="flex flex-row items-center gap-3 bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-lg"
      >
                                                                {/* Product Image */}
          <div className="flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-40 xl:w-48 aspect-square relative rounded-2xl overflow-hidden">
@@ -231,7 +231,7 @@ function ProductCard({ product, index, onAddToCart, onViewProduct }: ProductCard
                  repeat: Infinity, 
                  ease: "easeInOut" 
                }}
-               className="absolute -top-1 -right-1 bg-black text-[#F7DD0F] rounded-full p-1.5 shadow-lg"
+               className="absolute -top-1 -right-1 bg-[#feda00] text-black rounded-full p-1.5 shadow-lg"
              >
                <Sparkles className="w-3 h-3" />
              </motion.div>
@@ -240,22 +240,22 @@ function ProductCard({ product, index, onAddToCart, onViewProduct }: ProductCard
                                            {/* Product Info */}
          <div className="flex-1 text-left space-y-1 sm:space-y-2 md:space-y-3 w-full">
                       {/* Category */}
-            <p className="text-white/70 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+            <p className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wider">
               {product.category}
             </p>
 
             {/* Title */}
-            <h3 className="text-xs sm:text-sm md:text-lg lg:text-xl font-bold text-white leading-tight line-clamp-2">
+            <h3 className="text-xs sm:text-sm md:text-lg lg:text-xl font-bold text-gray-900 leading-tight line-clamp-2">
               {product.name}
             </h3>
 
             {/* Price */}
             <div className="flex items-baseline gap-2">
-              <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-white">
+              <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-gray-900">
                 Rs {product.price?.toLocaleString()}
               </span>
               {product.original_price && product.original_price > product.price && (
-                <span className="text-xs sm:text-sm text-white/50 line-through">
+                <span className="text-xs sm:text-sm text-gray-500 line-through">
                   Rs {product.original_price.toLocaleString()}
                 </span>
               )}
@@ -265,7 +265,7 @@ function ProductCard({ product, index, onAddToCart, onViewProduct }: ProductCard
            <div className="flex flex-row gap-1 sm:gap-2 pt-1 sm:pt-2 mt-1 sm:mt-2">
                                                                                                <button
                 onClick={() => onViewProduct(product)}
-                className="group bg-[#F7DD0F] text-black px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-[#F7DD0F]/90 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2 shadow-lg min-h-[32px] sm:min-h-[40px] md:min-h-[48px] flex-1"
+                className="group bg-[#feda00] text-black px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-[#feda00]/90 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 sm:gap-2 shadow-lg min-h-[32px] sm:min-h-[40px] md:min-h-[48px] flex-1"
               >
                 Buy
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -273,7 +273,7 @@ function ProductCard({ product, index, onAddToCart, onViewProduct }: ProductCard
              
                           <button
                 onClick={() => onAddToCart(product)}
-                className="group border border-white text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-[#feda00] hover:text-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 shadow-lg min-h-[32px] sm:min-h-[40px] md:min-h-[48px] flex-1"
+                className="group border border-gray-300 text-gray-700 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-[#feda00] hover:text-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 shadow-lg min-h-[32px] sm:min-h-[40px] md:min-h-[48px] flex-1"
               >
                Cart
                <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />

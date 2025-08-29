@@ -323,7 +323,6 @@ export default function DopeTechEcommerce() {
 
   
   const [showBackToCategories, setShowBackToCategories] = useState(false)
-  const [showJumpButton, setShowJumpButton] = useState(false)
   const [isCategoryInView, setIsCategoryInView] = useState(true)
   const [categoryIconIndex, setCategoryIconIndex] = useState(0)
   const [headerOffset, setHeaderOffset] = useState<number>(72)
@@ -893,10 +892,7 @@ export default function DopeTechEcommerce() {
     setShowBackToCategories(!isCategoryInView)
   }, [isCategoryInView])
 
-  // Show jump button when categories are not in view
-  useEffect(() => {
-    setShowJumpButton(showBackToCategories)
-  }, [showBackToCategories])
+
 
   // Optimized poster auto-scroll
   useEffect(() => {
@@ -949,19 +945,7 @@ export default function DopeTechEcommerce() {
     }, 100)
   }
 
-  const scrollToCategoryFilters = () => {
-    setTimeout(() => {
-      const header = document.querySelector('header.dopetech-nav') as HTMLElement | null
-      const headerHeight = header ? header.offsetHeight + 12 : 72
-      const elem = categorySectionRef.current
-      if (elem) {
-        const rect = elem.getBoundingClientRect()
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-        const targetPosition = scrollTop + rect.top - headerHeight
-        window.scrollTo({ top: targetPosition, behavior: 'smooth' })
-      }
-    }, 50)
-  }
+
 
   const handleAddToCartWithTracking = (product: Product) => {
     addToCart(product, 1)
@@ -2190,35 +2174,7 @@ export default function DopeTechEcommerce() {
 
 
 
-      {/* Jump to Categories floating button - Circular like AI chat */}
-      {!cartOpen && !checkoutModalOpen && !isCategoryInView && categories.length > 0 && (
-        <button
-          onClick={scrollToCategoryFilters}
-          className="fixed bottom-6 right-4 md:bottom-8 md:right-6 z-[9999] frosted-glass-yellow frosted-glass-yellow-hover text-black p-4 rounded-full touch-manipulation flex items-center justify-center transition-all duration-300 ease-in-out shadow-lg"
-          style={{ minHeight: '56px', minWidth: '56px', maxWidth: '56px', maxHeight: '56px' }}
-                     aria-label="Jump to categories"
-        >
-          {(() => {
-            const item = categories[categoryIconIndex]
-            if (!item) return null
-            const key = `${item.id}-${categoryIconIndex}`
-            const commonClasses = "w-5 h-5 block text-[#F7DD0F] animate-fade-in animate-scale-in will-change-opacity will-change-transform"
-            if (typeof item.icon === 'object' && 'type' in item.icon && (item.icon as any).type === 'svg') {
-              return (
-                <span key={key} className="inline-flex items-center justify-center">
-                  <SvgIcon svgContent={(item.icon as { type: 'svg', content: string }).content} className={commonClasses} />
-                </span>
-              )
-            }
-            const IconComp = item.icon as React.ComponentType<{ className?: string }>
-            return (
-              <span key={key} className="inline-flex items-center justify-center">
-                <IconComp className={commonClasses} />
-              </span>
-            )
-          })()}
-        </button>
-      )}
+
 
       {/* Checkout Modal */}
       <SupabaseCheckout

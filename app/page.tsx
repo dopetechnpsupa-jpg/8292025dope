@@ -1934,9 +1934,9 @@ export default function DopeTechEcommerce() {
             </p>
           </div>
 
-          {/* Featured Product Image Container */}
-          <div className="w-full mx-auto animate-fade-in-up borderless-glow cv-auto rounded-2xl overflow-hidden ring-1 ring-white/10 px-4">
-            <div className="w-full h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 2xl:h-80 shadow-xl relative overflow-hidden">
+          {/* Featured Product Image Container - Styled like Sliding Carousel */}
+          <div className="w-full mx-auto animate-fade-in-up rounded-2xl overflow-hidden bg-black shadow-2xl px-4">
+            <div className="w-full h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 2xl:h-80 relative overflow-hidden">
               {dopePicks.length > 0 ? (
                 // Show featured product image
                 <div 
@@ -1947,17 +1947,17 @@ export default function DopeTechEcommerce() {
                     }
                   }}
                 >
-                  <img
-                    src={getPrimaryImageUrl(dopePicks[0])}
-                    alt={dopePicks[0].name}
-                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-product.svg';
-                    }}
-                  />
-                  {/* Overlay with product info */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
+                  {/* Background Image - Styled like carousel */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${getPrimaryImageUrl(dopePicks[0])})` }}
+                  >
+                    {/* Gradient Overlay - Matching carousel style */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+                  </div>
+                  
+                  {/* Content Display - Matching carousel style */}
+                  <div className="absolute inset-0 flex items-end">
                     <div className="p-4 sm:p-6 w-full">
                       <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 drop-shadow-lg">
                         {dopePicks[0].name}
